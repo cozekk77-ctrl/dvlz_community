@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DVLZ Community</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #000000;
+            --bg-secondary: #1a1a1a;
+            --accent-red: #ff0000;
+            --accent-red-dark: #cc0000;
+            --text-white: #ffffff;
+            --text-gray: #999999;
+            --border: #333333;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-white);
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Header */
+        header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--accent-red);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-red);
+            letter-spacing: 2px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: var(--accent-red);
+            color: var(--text-white);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-red-dark);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-white);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .btn-admin {
+            background: var(--text-white);
+            color: var(--bg-primary);
+        }
+
+        .btn-admin:hover {
+            background: var(--text-gray);
+        }
+
+        /* Landing */
+        .landing {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+        .landing.hidden {
+            display: none;
+        }
+
+        .landing h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: 3px;
+        }
+
+        .landing p {
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            color: var(--text-gray);
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+
+        .landing-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: none;
+            padding: 3rem 0;
+        }
+
+        .main-content.active {
+            display: block;
+        }
+
+        .welcome {
+            text-align: center;
+            padding: 2rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .welcome h2 {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent-red);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-red);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            display: none;
+            padding: 3rem 0;
+        }
+
+        .admin-panel.active {
+            display: block;
+        }
+
+        .admin-header {
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-red);
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .admin-header h1 {
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-tabs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .admin-tab {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        .admin-tab.active {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+        }
+
+        .admin-tab:hover {
+            border-color: var(--accent-red);
+        }
+
+        .admin-section {
+            display: none;
+        }
+
+        .admin-section.active {
+            display: block;
+        }
+
+        .admin-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .admin-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-red);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Lists */
+        .list-item {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .list-info {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .list-info strong {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .list-info small {
+            color: var(--text-gray);
+        }
+
+        .list-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .btn-promote {
+            background: var(--text-white);
+            color: var(--bg-primary);
+        }
+
+        .btn-delete {
+            background: var(--accent-red);
+            color: var(--text-white);
+        }
+
+        .btn-small:hover {
+            opacity: 0.8;
+        }
+
+        /* Forms */
+        .form-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 0.8rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-white);
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent-red);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-red);
+            padding: 2rem;
+            max-width: 400px;
+            width: 100%;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-white);
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: var(--accent-red);
+        }
+
+        .modal h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .form-toggle {
+            text-align: center;
+            margin-top: 1rem;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        .form-toggle a {
+            color: var(--accent-red);
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .form-toggle a:hover {
+            text-decoration: underline;
+        }
+
+        /* Settings Grid */
+        .settings-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .danger-zone {
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid var(--accent-red);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .danger-zone h4 {
+            color: var(--accent-red);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-tabs {
+                grid-template-columns: 1fr;
+            }
+
+            .list-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .list-actions {
+                width: 100%;
+            }
+
+            .btn-small {
+                flex: 1;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .btn {
+                flex: 1;
+                min-width: 120px;
+            }
+
+            .landing-buttons {
+                flex-direction: column;
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .landing-buttons .btn {
+                width: 100%;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Hide scrollbar but keep functionality */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-red);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">DVLZ</div>
+                <div class="nav-buttons">
+                    <div id="beforeLogin">
+                        <button class="btn btn-primary" onclick="openModal('login')">Login</button>
+                    </div>
+                    <div id="afterLogin" style="display: none;">
+                        <button class="btn btn-secondary" onclick="showHome()">Home</button>
+                        <button class="btn btn-admin" id="adminBtn" onclick="showAdmin()" style="display: none;">Admin</button>
+                        <button class="btn btn-primary" onclick="logout()">Logout</button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Landing Screen -->
+    <section class="landing" id="landingScreen">
+        <div class="container">
+            <h1>DVLZ COMMUNITY</h1>
+            <p>Exclusive gaming community. Login to access all features.</p>
+            <div class="landing-buttons">
+                <button class="btn btn-primary" onclick="openModal('login')">Login</button>
+                <button class="btn btn-secondary" onclick="openModal('register')">Create Account</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="container">
+            <div class="welcome">
+                <h2>Welcome, <span id="username"></span></h2>
+                <p style="color: var(--text-gray); margin: 0;">Your gaming hub</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number" id="statMembers">0</span>
+                    <span class="stat-label">Total Members</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="statGames">0</span>
+                    <span class="stat-label">Total Games</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="statOnline">0</span>
+                    <span class="stat-label">Online Now</span>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <h3>Featured Games</h3>
+                <div id="gamesList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div class="admin-panel" id="adminPanel">
+        <div class="container">
+            <div class="admin-header">
+                <h1>Admin Control Panel</h1>
+                <p style="color: var(--text-gray); margin: 0;">Full system control</p>
+            </div>
+
+            <div class="admin-tabs">
+                <div class="admin-tab active" onclick="switchTab('members')">Members</div>
+                <div class="admin-tab" onclick="switchTab('games')">Games</div>
+                <div class="admin-tab" onclick="switchTab('appearance')">Appearance</div>
+                <div class="admin-tab" onclick="switchTab('settings')">Settings</div>
+            </div>
+
+            <!-- Members Tab -->
+            <div class="admin-section active" id="tabMembers">
+                <div class="admin-card">
+                    <h3>Manage Members</h3>
+                    <div id="membersList"></div>
+                </div>
+            </div>
+
+            <!-- Games Tab -->
+            <div class="admin-section" id="tabGames">
+                <div class="admin-card">
+                    <h3>Add New Game</h3>
+                    <form class="form-grid" onsubmit="addGame(event)">
+                        <div class="form-group">
+                            <label>Game Title</label>
+                            <input type="text" id="gameTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Players Online</label>
+                            <input type="number" id="gamePlayers" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Rating (0-5)</label>
+                            <input type="text" id="gameRating" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Game</button>
+                    </form>
+                </div>
+
+                <div class="admin-card">
+                    <h3>All Games</h3>
+                    <div id="adminGamesList"></div>
+                </div>
+            </div>
+
+            <!-- Appearance Tab -->
+            <div class="admin-section" id="tabAppearance">
+                <div class="admin-card">
+                    <h3>Customize Colors</h3>
+                    <form class="form-grid" onsubmit="updateColors(event)">
+                        <div class="form-group">
+                            <label>Background Color</label>
+                            <input type="color" id="bgColor" value="#000000">
+                        </div>
+                        <div class="form-group">
+                            <label>Accent Color</label>
+                            <input type="color" id="accentColor" value="#ff0000">
+                        </div>
+                        <div class="form-group">
+                            <label>Text Color</label>
+                            <input type="color" id="textColor" value="#ffffff">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Apply Colors</button>
+                        <button type="button" class="btn btn-secondary" onclick="resetColors()">Reset to Default</button>
+                    </form>
+                </div>
+
+                <div class="admin-card">
+                    <h3>Community Branding</h3>
+                    <form class="form-grid" onsubmit="updateBranding(event)">
+                        <div class="form-group">
+                            <label>Community Name</label>
+                            <input type="text" id="communityName" value="DVLZ">
+                        </div>
+                        <div class="form-group">
+                            <label>Welcome Message</label>
+                            <textarea id="welcomeMessage" rows="3">Exclusive gaming community. Login to access all features.</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Branding</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="admin-section" id="tabSettings">
+                <div class="admin-card">
+                    <h3>Admin Settings</h3>
+                    <form class="form-grid" onsubmit="updateAdminPassword(event)">
+                        <div class="form-group">
+                            <label>Change Admin Password</label>
+                            <input type="password" id="newAdminPassword" placeholder="New password">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Password</button>
+                    </form>
+                </div>
+
+                <div class="admin-card">
+                    <h3>Community Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-number" id="adminStatMembers">0</span>
+                            <span class="stat-label">Total Members</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="adminStatGames">0</span>
+                            <span class="stat-label">Total Games</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="adminStatAdmins">0</span>
+                            <span class="stat-label">Total Admins</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="danger-zone">
+                    <h4>Danger Zone</h4>
+                    <p style="color: var(--text-gray); margin-bottom: 1rem;">This action cannot be undone</p>
+                    <button class="btn btn-primary" onclick="resetAllData()" style="background: var(--accent-red);">Reset All Data</button>
+                </div>
+            </div>
+
+            <button class="btn btn-secondary" onclick="showHome()" style="margin-top: 2rem;">Back to Home</button>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            
+            <div id="loginForm">
+                <h2>Login</h2>
+                <form class="form-grid" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="loginUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+                <div class="form-toggle">
+                    New user? <a onclick="switchToRegister()">Create account</a>
+                </div>
+            </div>
+
+            <div id="registerForm" style="display: none;">
+                <h2>Register</h2>
+                <form class="form-grid" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="registerUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="registerPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Account</button>
+                </form>
+                <div class="form-toggle">
+                    Have account? <a onclick="switchToLogin()">Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Default admin
+        const DEFAULT_ADMIN = {
+            username: 'admin',
+            password: 'admin123',
+            email: 'admin@dvlz.com',
+            isAdmin: true,
+            level: 99
+        };
+
+        // Data
+        let users = JSON.parse(localStorage.getItem('dvlz_users')) || { 'admin': DEFAULT_ADMIN };
+        let games = JSON.parse(localStorage.getItem('dvlz_games')) || [
+            { id: 1, title: 'Battle Royale Arena', players: 1234, rating: '4.9' },
+            { id: 2, title: 'Tactical Warfare', players: 892, rating: '4.8' }
+        ];
+        let settings = JSON.parse(localStorage.getItem('dvlz_settings')) || {
+            communityName: 'DVLZ',
+            welcomeMessage: 'Exclusive gaming community. Login to access all features.',
+            bgColor: '#000000',
+            accentColor: '#ff0000',
+            textColor: '#ffffff'
+        };
+        let currentUser = null;
+
+        // Save data
+        function saveData() {
+            localStorage.setItem('dvlz_users', JSON.stringify(users));
+            localStorage.setItem('dvlz_games', JSON.stringify(games));
+            localStorage.setItem('dvlz_settings', JSON.stringify(settings));
+        }
+
+        // Apply settings
+        function applySettings() {
+            document.documentElement.style.setProperty('--bg-primary', settings.bgColor);
+            document.documentElement.style.setProperty('--accent-red', settings.accentColor);
+            document.documentElement.style.setProperty('--text-white', settings.textColor);
+            
+            document.querySelectorAll('.logo').forEach(el => {
+                el.textContent = settings.communityName;
+            });
+            
+            document.querySelector('.landing p').textContent = settings.welcomeMessage;
+        }
+
+        // Initialize
+        function init() {
+            saveData();
+            applySettings();
+            checkAuth();
+        }
+
+        // Check auth
+        function checkAuth() {
+            const saved = localStorage.getItem('dvlz_current_user');
+            if (saved) {
+                currentUser = JSON.parse(saved);
+                showMainContent();
+            } else {
+                showLanding();
+            }
+        }
+
+        // Show landing
+        function showLanding() {
+            document.getElementById('landingScreen').classList.remove('hidden');
+            document.getElementById('mainContent').classList.remove('active');
+            document.getElementById('adminPanel').classList.remove('active');
+            document.getElementById('beforeLogin').style.display = 'block';
+            document.getElementById('afterLogin').style.display = 'none';
+        }
+
+        // Show main
+        function showMainContent() {
+            document.getElementById('landingScreen').classList.add('hidden');
+            document.getElementById('mainContent').classList.add('active');
+            document.getElementById('adminPanel').classList.remove('active');
+            document.getElementById('beforeLogin').style.display = 'none';
+            document.getElementById('afterLogin').style.display = 'flex';
+            
+            document.getElementById('username').textContent = currentUser.username.toUpperCase();
+            
+            if (currentUser.isAdmin) {
+                document.getElementById('adminBtn').style.display = 'block';
+            }
+            
+            updateStats();
+            loadGames();
+        }
+
+        // Show home
+        function showHome() {
+            document.getElementById('mainContent').classList.add('active');
+            document.getElementById('adminPanel').classList.remove('active');
+        }
+
+        // Show admin
+        function showAdmin() {
+            if (!currentUser || !currentUser.isAdmin) {
+                alert('Access denied. Admin only.');
+                return;
+            }
+            
+            document.getElementById('mainContent').classList.remove('active');
+            document.getElementById('adminPanel').classList.add('active');
+            
+            loadAdminData();
+        }
+
+        // Switch tab
+        function switchTab(tab) {
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+        }
+
+        // Load admin data
+        function loadAdminData() {
+            // Members
+            const membersList = document.getElementById('membersList');
+            membersList.innerHTML = '';
+            
+            Object.values(users).forEach(user => {
+                membersList.innerHTML += `
+                    <div class="list-item">
+                        <div class="list-info">
+                            <strong>${user.username}</strong>
+                            <small>${user.isAdmin ? 'Admin' : 'Member'} - Level ${user.level || 1}</small>
+                        </div>
+                        <div class="list-actions">
+                            ${!user.isAdmin ? `
+                                <button class="btn-small btn-promote" onclick="promoteUser('${user.username}')">Promote</button>
+                                <button class="btn-small btn-delete" onclick="deleteUser('${user.username}')">Delete</button>
+                            ` : '<span style="padding: 0.4rem 1rem; background: var(--text-white); color: var(--bg-primary); font-weight: 600; font-size: 0.85rem;">OWNER</span>'}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Games
+            const adminGamesList = document.getElementById('adminGamesList');
+            adminGamesList.innerHTML = '';
+            
+            games.forEach(game => {
+                adminGamesList.innerHTML += `
+                    <div class="list-item">
+                        <div class="list-info">
+                            <strong>${game.title}</strong>
+                            <small>${game.players} players - ${game.rating} rating</small>
+                        </div>
+                        <button class="btn-small btn-delete" onclick="deleteGame(${game.id})">Delete</button>
+                    </div>
+                `;
+            });
+            
+            // Stats
+            document.getElementById('adminStatMembers').textContent = Object.keys(users).length;
+            document.getElementById('adminStatGames').textContent = games.length;
+            document.getElementById('adminStatAdmins').textContent = Object.values(users).filter(u => u.isAdmin).length;
+            
+            // Load current appearance settings
+            document.getElementById('bgColor').value = settings.bgColor;
+            document.getElementById('accentColor').value = settings.accentColor;
+            document.getElementById('textColor').value = settings.textColor;
+            document.getElementById('communityName').value = settings.communityName;
+            document.getElementById('welcomeMessage').value = settings.welcomeMessage;
+        }
+
+        // Update colors
+        function updateColors(e) {
+            e.preventDefault();
+            settings.bgColor = document.getElementById('bgColor').value;
+            settings.accentColor = document.getElementById('accentColor').value;
+            settings.textColor = document.getElementById('textColor').value;
+            saveData();
+            applySettings();
+            alert('Colors updated successfully');
+        }
+
+        // Reset colors
+        function resetColors() {
+            settings.bgColor = '#000000';
+            settings.accentColor = '#ff0000';
+            settings.textColor = '#ffffff';
+            saveData();
+            applySettings();
+            loadAdminData();
+            alert('Colors reset to default');
+        }
+
+        // Update branding
+        function updateBranding(e) {
+            e.preventDefault();
+            settings.communityName = document.getElementById('communityName').value;
+            settings.welcomeMessage = document.getElementById('welcomeMessage').value;
+            saveData();
+            applySettings();
+            alert('Branding updated successfully');
+        }
+
+        // Update admin password
+        function updateAdminPassword(e) {
+            e.preventDefault();
+            const newPassword = document.getElementById('newAdminPassword').value;
+            if (newPassword.length < 6) {
+                alert('Password must be at least 6 characters');
+                return;
+            }
+            users['admin'].password = newPassword;
+            saveData();
+            alert('Admin password updated successfully');
+            e.target.reset();
+        }
+
+        // Add game
+        function addGame(e) {
+            e.preventDefault();
+            
+            const game = {
+                id: Date.now(),
+                title: document.getElementById('gameTitle').value,
+                players: parseInt(document.getElementById('gamePlayers').value),
+                rating: document.getElementById('gameRating').value
+            };
+            
+            games.push(game);
+            saveData();
+            loadAdminData();
+            updateStats();
+            loadGames();
+            
+            e.target.reset();
+            alert('Game added successfully');
+        }
+
+        // Delete game
+        function deleteGame(id) {
+            if (confirm('Delete this game?')) {
+                games = games.filter(g => g.id !== id);
+                saveData();
+                loadAdminData();
+                updateStats();
+                loadGames();
+                alert('Game deleted');
+            }
+        }
+
+        // Promote user
+        function promoteUser(username) {
+            if (confirm('Promote ' + username + ' to admin?')) {
+                users[username].isAdmin = true;
+                users[username].level = 99;
+                saveData();
+                loadAdminData();
+                alert('User promoted to admin');
+            }
+        }
+
+        // Delete user
+        function deleteUser(username) {
+            if (confirm('Delete ' + username + '? This cannot be undone.')) {
+                delete users[username];
+                saveData();
+                loadAdminData();
+                updateStats();
+                alert('User deleted');
+            }
+        }
+
+        // Reset all data
+        function resetAllData() {
+            if (confirm('WARNING: Delete ALL data? This cannot be undone!')) {
+                if (confirm('Are you absolutely sure?')) {
+                    users = { 'admin': DEFAULT_ADMIN };
+                    games = [];
+                    settings = {
+                        communityName: 'DVLZ',
+                        welcomeMessage: 'Exclusive gaming community. Login to access all features.',
+                        bgColor: '#000000',
+                        accentColor: '#ff0000',
+                        textColor: '#ffffff'
+                    };
+                    saveData();
+                    applySettings();
+                    loadAdminData();
+                    updateStats();
+                    loadGames();
+                    alert('All data has been reset');
+                }
+            }
+        }
+
+        // Update stats
+        function updateStats() {
+            document.getElementById('statMembers').textContent = Object.keys(users).length;
+            document.getElementById('statGames').textContent = games.length;
+            document.getElementById('statOnline').textContent = Math.floor(Object.keys(users).length * 0.3);
+        }
+
+        // Load games
+        function loadGames() {
+            const gamesList = document.getElementById('gamesList');
+            if (games.length === 0) {
+                gamesList.innerHTML = '<p style="color: var(--text-gray);">No games available</p>';
+                return;
+            }
+            
+            gamesList.innerHTML = '';
+            games.forEach(game => {
+                gamesList.innerHTML += `
+                    <div class="list-item">
+                        <div class="list-info">
+                            <strong>${game.title}</strong>
+                            <small>${game.players} players online - ${game.rating} rating</small>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Modal
+        function openModal(type) {
+            document.getElementById('authModal').classList.add('active');
+            if (type === 'register') {
+                switchToRegister();
+            } else {
+                switchToLogin();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('authModal').classList.remove('active');
+        }
+
+        function switchToRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        }
+
+        function switchToLogin() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+
+        // Login
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (users[username] && users[username].password === password) {
+                currentUser = users[username];
+                localStorage.setItem('dvlz_current_user', JSON.stringify(currentUser));
+                closeModal();
+                showMainContent();
+                alert('Welcome back, ' + username);
+            } else {
+                alert('Invalid credentials');
+            }
+        }
+
+        // Register
+        function handleRegister(e) {
+            e.preventDefault();
+            const username = document.getElementById('registerUsername').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+
+            if (users[username]) {
+                alert('Username already exists');
+                return;
+            }
+
+            users[username] = {
+                username,
+                email,
+                password,
+                isAdmin: false,
+                level: 1
+            };
+
+            saveData();
+            currentUser = users[username];
+            localStorage.setItem('dvlz_current_user', JSON.stringify(currentUser));
+            
+            closeModal();
+            showMainContent();
+            alert('Account created successfully');
+        }
+
+        // Logout
+        function logout() {
+            if (confirm('Logout?')) {
+                currentUser = null;
+                localStorage.removeItem('dvlz_current_user');
+                showLanding();
+            }
+        }
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html>
