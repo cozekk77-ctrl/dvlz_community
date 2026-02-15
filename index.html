@@ -307,6 +307,7 @@
             display: flex;
             gap: 0.5rem;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .btn-small {
@@ -329,6 +330,11 @@
             color: var(--text-white);
         }
 
+        .btn-edit {
+            background: var(--text-gray);
+            color: var(--text-white);
+        }
+
         .btn-small:hover {
             opacity: 0.8;
         }
@@ -336,6 +342,12 @@
         /* Forms */
         .form-grid {
             display: grid;
+            gap: 1rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
         }
 
@@ -370,6 +382,47 @@
             border-color: var(--accent-red);
         }
 
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: var(--border);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: var(--accent-red);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: var(--text-white);
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(30px);
+        }
+
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+
         /* Modal */
         .modal {
             display: none;
@@ -393,9 +446,11 @@
             background: var(--bg-secondary);
             border: 2px solid var(--accent-red);
             padding: 2rem;
-            max-width: 400px;
+            max-width: 500px;
             width: 100%;
             position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-close {
@@ -443,11 +498,6 @@
         }
 
         /* Settings Grid */
-        .settings-grid {
-            display: grid;
-            gap: 1rem;
-        }
-
         .danger-zone {
             background: rgba(255, 0, 0, 0.1);
             border: 2px solid var(--accent-red);
@@ -460,6 +510,32 @@
             margin-bottom: 1rem;
             text-transform: uppercase;
             letter-spacing: 2px;
+        }
+
+        .feature-item {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .feature-header h4 {
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .feature-description {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
         }
 
         /* Responsive */
@@ -493,6 +569,10 @@
             .btn-small {
                 flex: 1;
             }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 480px) {
@@ -521,7 +601,6 @@
             }
         }
 
-        /* Hide scrollbar but keep functionality */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -572,7 +651,7 @@
         <div class="container">
             <div class="welcome">
                 <h2>Welcome, <span id="username"></span></h2>
-                <p style="color: var(--text-gray); margin: 0;">Your gaming hub</p>
+                <p style="color: var(--text-gray); margin: 0;">Level <span id="userLevel">1</span></p>
             </div>
 
             <div class="stats-grid">
@@ -588,6 +667,11 @@
                     <span class="stat-number" id="statOnline">0</span>
                     <span class="stat-label">Online Now</span>
                 </div>
+            </div>
+
+            <div class="admin-card" id="featuresDisplay">
+                <h3>Community Features</h3>
+                <div id="activeFeaturesDisplay"></div>
             </div>
 
             <div class="admin-card">
@@ -608,6 +692,7 @@
             <div class="admin-tabs">
                 <div class="admin-tab active" onclick="switchTab('members')">Members</div>
                 <div class="admin-tab" onclick="switchTab('games')">Games</div>
+                <div class="admin-tab" onclick="switchTab('features')">Features</div>
                 <div class="admin-tab" onclick="switchTab('appearance')">Appearance</div>
                 <div class="admin-tab" onclick="switchTab('settings')">Settings</div>
             </div>
@@ -629,13 +714,15 @@
                             <label>Game Title</label>
                             <input type="text" id="gameTitle" required>
                         </div>
-                        <div class="form-group">
-                            <label>Players Online</label>
-                            <input type="number" id="gamePlayers" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Rating (0-5)</label>
-                            <input type="text" id="gameRating" required>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Players Online</label>
+                                <input type="number" id="gamePlayers" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Rating (0-5)</label>
+                                <input type="text" id="gameRating" required>
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-primary">Add Game</button>
                     </form>
@@ -647,22 +734,48 @@
                 </div>
             </div>
 
+            <!-- Features Tab -->
+            <div class="admin-section" id="tabFeatures">
+                <div class="admin-card">
+                    <h3>Community Features</h3>
+                    <p style="color: var(--text-gray); margin-bottom: 2rem;">Enable or disable features for your community</p>
+                    <div id="featuresList"></div>
+                </div>
+
+                <div class="admin-card">
+                    <h3>Add Custom Feature</h3>
+                    <form class="form-grid" onsubmit="addFeature(event)">
+                        <div class="form-group">
+                            <label>Feature Name</label>
+                            <input type="text" id="featureName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Feature Description</label>
+                            <textarea id="featureDescription" rows="2" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Feature</button>
+                    </form>
+                </div>
+            </div>
+
             <!-- Appearance Tab -->
             <div class="admin-section" id="tabAppearance">
                 <div class="admin-card">
                     <h3>Customize Colors</h3>
                     <form class="form-grid" onsubmit="updateColors(event)">
-                        <div class="form-group">
-                            <label>Background Color</label>
-                            <input type="color" id="bgColor" value="#000000">
-                        </div>
-                        <div class="form-group">
-                            <label>Accent Color</label>
-                            <input type="color" id="accentColor" value="#ff0000">
-                        </div>
-                        <div class="form-group">
-                            <label>Text Color</label>
-                            <input type="color" id="textColor" value="#ffffff">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Background Color</label>
+                                <input type="color" id="bgColor" value="#000000">
+                            </div>
+                            <div class="form-group">
+                                <label>Accent Color</label>
+                                <input type="color" id="accentColor" value="#ff0000">
+                            </div>
+                            <div class="form-group">
+                                <label>Text Color</label>
+                                <input type="color" id="textColor" value="#ffffff">
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-primary">Apply Colors</button>
                         <button type="button" class="btn btn-secondary" onclick="resetColors()">Reset to Default</button>
@@ -692,7 +805,7 @@
                     <form class="form-grid" onsubmit="updateAdminPassword(event)">
                         <div class="form-group">
                             <label>Change Admin Password</label>
-                            <input type="password" id="newAdminPassword" placeholder="New password">
+                            <input type="password" id="newAdminPassword" placeholder="New password (min 6 characters)">
                         </div>
                         <button type="submit" class="btn btn-primary">Update Password</button>
                     </form>
@@ -774,6 +887,32 @@
         </div>
     </div>
 
+    <!-- Edit Member Modal -->
+    <div class="modal" id="editMemberModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeEditModal()">×</button>
+            <h2>Edit Member</h2>
+            <form class="form-grid" onsubmit="saveMemberEdit(event)">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="editUsername" readonly style="opacity: 0.6;">
+                </div>
+                <div class="form-group">
+                    <label>Level</label>
+                    <input type="number" id="editLevel" min="1" max="999" required>
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select id="editRole">
+                        <option value="Member">Member</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Default admin
         const DEFAULT_ADMIN = {
@@ -784,12 +923,22 @@
             level: 99
         };
 
+        // Default features
+        const DEFAULT_FEATURES = [
+            { id: 1, name: 'Leaderboards', description: 'Global ranking system', enabled: true },
+            { id: 2, name: 'Tournaments', description: 'Competitive events', enabled: true },
+            { id: 3, name: 'Chat System', description: 'Real-time messaging', enabled: true },
+            { id: 4, name: 'Voice Channels', description: 'Voice communication', enabled: false },
+            { id: 5, name: 'Achievements', description: 'Unlock badges and rewards', enabled: true }
+        ];
+
         // Data
         let users = JSON.parse(localStorage.getItem('dvlz_users')) || { 'admin': DEFAULT_ADMIN };
         let games = JSON.parse(localStorage.getItem('dvlz_games')) || [
             { id: 1, title: 'Battle Royale Arena', players: 1234, rating: '4.9' },
             { id: 2, title: 'Tactical Warfare', players: 892, rating: '4.8' }
         ];
+        let features = JSON.parse(localStorage.getItem('dvlz_features')) || DEFAULT_FEATURES;
         let settings = JSON.parse(localStorage.getItem('dvlz_settings')) || {
             communityName: 'DVLZ',
             welcomeMessage: 'Exclusive gaming community. Login to access all features.',
@@ -798,11 +947,13 @@
             textColor: '#ffffff'
         };
         let currentUser = null;
+        let editingMember = null;
 
         // Save data
         function saveData() {
             localStorage.setItem('dvlz_users', JSON.stringify(users));
             localStorage.setItem('dvlz_games', JSON.stringify(games));
+            localStorage.setItem('dvlz_features', JSON.stringify(features));
             localStorage.setItem('dvlz_settings', JSON.stringify(settings));
         }
 
@@ -831,6 +982,11 @@
             const saved = localStorage.getItem('dvlz_current_user');
             if (saved) {
                 currentUser = JSON.parse(saved);
+                // Sync with latest user data
+                if (users[currentUser.username]) {
+                    currentUser = users[currentUser.username];
+                    localStorage.setItem('dvlz_current_user', JSON.stringify(currentUser));
+                }
                 showMainContent();
             } else {
                 showLanding();
@@ -855,6 +1011,7 @@
             document.getElementById('afterLogin').style.display = 'flex';
             
             document.getElementById('username').textContent = currentUser.username.toUpperCase();
+            document.getElementById('userLevel').textContent = currentUser.level || 1;
             
             if (currentUser.isAdmin) {
                 document.getElementById('adminBtn').style.display = 'block';
@@ -862,6 +1019,30 @@
             
             updateStats();
             loadGames();
+            displayActiveFeatures();
+        }
+
+        // Display active features
+        function displayActiveFeatures() {
+            const display = document.getElementById('activeFeaturesDisplay');
+            const activeFeatures = features.filter(f => f.enabled);
+            
+            if (activeFeatures.length === 0) {
+                display.innerHTML = '<p style="color: var(--text-gray);">No features enabled</p>';
+                return;
+            }
+            
+            display.innerHTML = '';
+            activeFeatures.forEach(feature => {
+                display.innerHTML += `
+                    <div class="list-item">
+                        <div class="list-info">
+                            <strong>${feature.name}</strong>
+                            <small>${feature.description}</small>
+                        </div>
+                    </div>
+                `;
+            });
         }
 
         // Show home
@@ -906,10 +1087,11 @@
                             <small>${user.isAdmin ? 'Admin' : 'Member'} - Level ${user.level || 1}</small>
                         </div>
                         <div class="list-actions">
+                            <button class="btn-small btn-edit" onclick="openEditMember('${user.username}')">Edit</button>
                             ${!user.isAdmin ? `
                                 <button class="btn-small btn-promote" onclick="promoteUser('${user.username}')">Promote</button>
                                 <button class="btn-small btn-delete" onclick="deleteUser('${user.username}')">Delete</button>
-                            ` : '<span style="padding: 0.4rem 1rem; background: var(--text-white); color: var(--bg-primary); font-weight: 600; font-size: 0.85rem;">OWNER</span>'}
+                            ` : user.username === 'admin' ? '<span style="padding: 0.4rem 1rem; background: var(--text-white); color: var(--bg-primary); font-weight: 600; font-size: 0.85rem;">OWNER</span>' : `<button class="btn-small btn-delete" onclick="deleteUser('${user.username}')">Delete</button>`}
                         </div>
                     </div>
                 `;
@@ -930,18 +1112,125 @@
                     </div>
                 `;
             });
+
+            // Features
+            loadFeatures();
             
             // Stats
             document.getElementById('adminStatMembers').textContent = Object.keys(users).length;
             document.getElementById('adminStatGames').textContent = games.length;
             document.getElementById('adminStatAdmins').textContent = Object.values(users).filter(u => u.isAdmin).length;
             
-            // Load current appearance settings
+            // Load current settings
             document.getElementById('bgColor').value = settings.bgColor;
             document.getElementById('accentColor').value = settings.accentColor;
             document.getElementById('textColor').value = settings.textColor;
             document.getElementById('communityName').value = settings.communityName;
             document.getElementById('welcomeMessage').value = settings.welcomeMessage;
+        }
+
+        // Load features
+        function loadFeatures() {
+            const featuresList = document.getElementById('featuresList');
+            featuresList.innerHTML = '';
+            
+            features.forEach(feature => {
+                featuresList.innerHTML += `
+                    <div class="feature-item">
+                        <div class="feature-header">
+                            <h4>${feature.name}</h4>
+                            <div class="toggle-switch ${feature.enabled ? 'active' : ''}" onclick="toggleFeature(${feature.id})"></div>
+                        </div>
+                        <div class="feature-description">${feature.description}</div>
+                        ${!feature.default ? `<button class="btn-small btn-delete" onclick="deleteFeature(${feature.id})">Delete</button>` : ''}
+                    </div>
+                `;
+            });
+        }
+
+        // Toggle feature
+        function toggleFeature(id) {
+            const feature = features.find(f => f.id === id);
+            if (feature) {
+                feature.enabled = !feature.enabled;
+                saveData();
+                loadFeatures();
+                displayActiveFeatures();
+            }
+        }
+
+        // Add feature
+        function addFeature(e) {
+            e.preventDefault();
+            
+            const feature = {
+                id: Date.now(),
+                name: document.getElementById('featureName').value,
+                description: document.getElementById('featureDescription').value,
+                enabled: true,
+                default: false
+            };
+            
+            features.push(feature);
+            saveData();
+            loadFeatures();
+            displayActiveFeatures();
+            
+            e.target.reset();
+            alert('Feature added successfully');
+        }
+
+        // Delete feature
+        function deleteFeature(id) {
+            if (confirm('Delete this feature?')) {
+                features = features.filter(f => f.id !== id);
+                saveData();
+                loadFeatures();
+                displayActiveFeatures();
+                alert('Feature deleted');
+            }
+        }
+
+        // Open edit member
+        function openEditMember(username) {
+            editingMember = username;
+            const user = users[username];
+            
+            document.getElementById('editUsername').value = user.username;
+            document.getElementById('editLevel').value = user.level || 1;
+            document.getElementById('editRole').value = user.isAdmin ? 'Admin' : 'Member';
+            
+            document.getElementById('editMemberModal').classList.add('active');
+        }
+
+        // Close edit modal
+        function closeEditModal() {
+            document.getElementById('editMemberModal').classList.remove('active');
+            editingMember = null;
+        }
+
+        // Save member edit
+        function saveMemberEdit(e) {
+            e.preventDefault();
+            
+            const level = parseInt(document.getElementById('editLevel').value);
+            const role = document.getElementById('editRole').value;
+            
+            users[editingMember].level = level;
+            users[editingMember].isAdmin = (role === 'Admin');
+            
+            saveData();
+            
+            // Update current user if editing self
+            if (currentUser.username === editingMember) {
+                currentUser = users[editingMember];
+                localStorage.setItem('dvlz_current_user', JSON.stringify(currentUser));
+                document.getElementById('userLevel').textContent = currentUser.level;
+            }
+            
+            loadAdminData();
+            closeEditModal();
+            alert('Member updated successfully');
         }
 
         // Update colors
@@ -1051,6 +1340,7 @@
                 if (confirm('Are you absolutely sure?')) {
                     users = { 'admin': DEFAULT_ADMIN };
                     games = [];
+                    features = DEFAULT_FEATURES;
                     settings = {
                         communityName: 'DVLZ',
                         welcomeMessage: 'Exclusive gaming community. Login to access all features.',
@@ -1063,6 +1353,7 @@
                     loadAdminData();
                     updateStats();
                     loadGames();
+                    displayActiveFeatures();
                     alert('All data has been reset');
                 }
             }
