@@ -22,7 +22,6 @@
             --border-color: #262626;
             --success-green: #10b981;
             --warning-yellow: #f59e0b;
-            --roblox-blue: #00a2ff;
         }
 
         body {
@@ -123,6 +122,13 @@
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
+            overflow: hidden;
+        }
+
+        .user-profile-nav img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .user-profile-nav:hover {
@@ -921,21 +927,32 @@
             padding: 4rem 2rem;
             color: var(--text-gray);
         }
+
+        .member-count {
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid var(--primary-red);
+            color: var(--primary-red);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
     <!-- Navigation -->
     <nav id="navbar">
         <div class="nav-container">
-            <a href="#" class="logo" onclick="location.reload()">
-                <span>DVLZ</span> ROBLOX
+            <a href="#" class="logo" onclick="showSection('home')">
+                <span id="logoTitle">DVLZ</span> ROBLOX
             </a>
             <ul class="nav-links" id="navLinks">
                 <li><a onclick="showSection('home')">Home</a></li>
                 <li><a onclick="showSection('members')">Members</a></li>
                 <li><a onclick="showSection('admins')">Admins</a></li>
                 <li>
-                    <div class="user-profile-nav" onclick="toggleUserDropdown()">
+                    <div class="user-profile-nav" onclick="toggleUserDropdown()" id="userProfileNav">
                         <span id="navUserInitial">?</span>
                     </div>
                     <div class="user-dropdown" id="userDropdown">
@@ -971,12 +988,12 @@
     <section class="hero" id="homeSection">
         <div class="hero-grid"></div>
         <div class="hero-content">
-            <div class="hero-badge">🎮 Roblox Community</div>
+            <div class="hero-badge" id="heroBadge">🎮 Roblox Community</div>
             <h1>
-                Welcome to <span class="gradient-text">DVLZ</span><br>
-                Roblox Community
+                <span id="heroWelcome">Welcome to</span> <span class="gradient-text" id="heroTitle">DVLZ</span><br>
+                <span id="heroCommunityText">Roblox Community</span>
             </h1>
-            <p class="hero-subtitle">
+            <p class="hero-subtitle" id="heroSubtitle">
                 Join komuniti Roblox yang paling power di Malaysia! Main sama-sama, create games,
                 dan build connections dengan players lain yang passionate.
             </p>
@@ -1006,6 +1023,7 @@
             <p class="section-subtitle">
                 Semua members dalam DVLZ Roblox Community
             </p>
+            <div class="member-count" id="memberCount">0 Members</div>
         </div>
         <input type="text" class="search-box" id="memberSearch" placeholder="🔍 Search members..." onkeyup="filterMembers()">
         <div class="members-grid" id="membersGrid">
@@ -1021,6 +1039,7 @@
             <p class="section-subtitle">
                 Team admins yang manage community kita
             </p>
+            <div class="member-count" id="adminCount">0 Admins</div>
         </div>
         <div class="members-grid" id="adminsGrid">
             <!-- Admins will be loaded here -->
@@ -1030,8 +1049,8 @@
     <!-- Footer -->
     <footer>
         <div class="footer-content">
-            <h3 style="margin-bottom: 1rem;"><span style="color: var(--primary-red);">DVLZ</span> Roblox Community</h3>
-            <p class="footer-text">
+            <h3 style="margin-bottom: 1rem;"><span style="color: var(--primary-red);" id="footerTitle">DVLZ</span> Roblox Community</h3>
+            <p class="footer-text" id="footerText">
                 &copy; 2024 DVLZ Roblox Community. All rights reserved.
             </p>
         </div>
@@ -1146,6 +1165,7 @@
         
         <div class="admin-tabs">
             <button class="admin-tab active" onclick="switchAdminTab('members')">Members</button>
+            <button class="admin-tab" onclick="switchAdminTab('content')">Content</button>
             <button class="admin-tab" onclick="switchAdminTab('settings')">Settings</button>
         </div>
         
@@ -1158,11 +1178,97 @@
                 </div>
             </div>
 
+            <!-- Content Tab -->
+            <div class="admin-section" id="adminContentTab">
+                <div class="form-group">
+                    <label class="form-label">🎯 Hero Section</label>
+                    <p style="color: var(--text-gray); margin-bottom: 1rem; font-size: 0.9rem;">Customize homepage hero section</p>
+                    
+                    <label class="form-label" style="font-size: 0.9rem; margin-top: 1rem;">Badge Text</label>
+                    <input type="text" class="form-input" id="settingBadge" placeholder="🎮 Roblox Community">
+                    
+                    <label class="form-label" style="font-size: 0.9rem; margin-top: 1rem;">Main Title</label>
+                    <input type="text" class="form-input" id="settingTitle" placeholder="DVLZ">
+                    
+                    <label class="form-label" style="font-size: 0.9rem; margin-top: 1rem;">Subtitle</label>
+                    <textarea class="form-textarea" id="settingSubtitle" rows="3" placeholder="Community description..."></textarea>
+                    
+                    <button class="submit-btn" onclick="saveHeroSettings()" style="margin-top: 1rem;">
+                        Save Hero Section
+                    </button>
+                </div>
+
+                <div class="form-group" style="margin-top: 2rem;">
+                    <label class="form-label">🎨 Theme Colors</label>
+                    <p style="color: var(--text-gray); margin-bottom: 1rem; font-size: 0.9rem;">Customize community colors</p>
+                    
+                    <label class="form-label" style="font-size: 0.9rem; margin-top: 1rem;">Primary Color</label>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <input type="color" id="settingPrimaryColor" value="#dc2626" style="width: 60px; height: 40px; border: 1px solid var(--border-color); border-radius: 8px; background: transparent; cursor: pointer;">
+                        <input type="text" class="form-input" id="settingPrimaryColorText" value="#dc2626" readonly style="flex: 1;">
+                    </div>
+                    
+                    <button class="submit-btn" onclick="saveColorSettings()" style="margin-top: 1rem;">
+                        Apply Color Theme
+                    </button>
+                </div>
+
+                <div class="form-group" style="margin-top: 2rem;">
+                    <label class="form-label">📝 Footer Text</label>
+                    <p style="color: var(--text-gray); margin-bottom: 1rem; font-size: 0.9rem;">Customize footer copyright text</p>
+                    
+                    <input type="text" class="form-input" id="settingFooter" placeholder="© 2024 DVLZ Roblox Community">
+                    
+                    <button class="submit-btn" onclick="saveFooterSettings()" style="margin-top: 1rem;">
+                        Save Footer
+                    </button>
+                </div>
+            </div>
+
             <!-- Settings Tab -->
             <div class="admin-section" id="adminSettingsTab">
                 <div class="form-group">
-                    <label class="form-label">Community Settings</label>
-                    <p style="color: var(--text-gray); margin-bottom: 1rem;">Manage your community preferences</p>
+                    <label class="form-label">⚙️ Community Settings</label>
+                    <p style="color: var(--text-gray); margin-bottom: 1rem; font-size: 0.9rem;">Advanced community configuration</p>
+                    
+                    <label class="form-label" style="font-size: 0.9rem; margin-top: 1rem;">Community Name</label>
+                    <input type="text" class="form-input" id="settingCommunityName" placeholder="DVLZ ROBLOX">
+                    
+                    <label class="form-label" style="font-size: 0.9rem; margin-top: 1rem;">Welcome Message (for new members)</label>
+                    <textarea class="form-textarea" id="settingWelcomeMsg" rows="3" placeholder="Welcome to the community!"></textarea>
+                    
+                    <button class="submit-btn" onclick="saveGeneralSettings()" style="margin-top: 1rem;">
+                        Save Settings
+                    </button>
+                </div>
+
+                <div class="form-group" style="margin-top: 2rem; background: var(--card-black); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem;">
+                    <label class="form-label" style="color: var(--primary-red);">🗑️ Danger Zone</label>
+                    <p style="color: var(--text-gray); margin-bottom: 1rem; font-size: 0.9rem;">Irreversible actions - use with caution</p>
+                    
+                    <button onclick="resetAllData()" style="width: 100%; background: var(--dark-red); color: var(--text-white); padding: 1rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 0.5rem;">
+                        Reset All Community Data
+                    </button>
+                    
+                    <button onclick="exportData()" style="width: 100%; background: transparent; color: var(--text-white); padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 0.5rem;">
+                        Export Community Data
+                    </button>
+                </div>
+
+                <div class="form-group" style="margin-top: 2rem;">
+                    <label class="form-label">📊 Community Statistics</label>
+                    <div style="background: var(--card-black); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-top: 1rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <p style="color: var(--text-gray); font-size: 0.85rem;">Total Members</p>
+                                <p style="color: var(--primary-red); font-size: 1.5rem; font-weight: 700;" id="statTotalMembers">0</p>
+                            </div>
+                            <div>
+                                <p style="color: var(--text-gray); font-size: 0.85rem;">Total Admins</p>
+                                <p style="color: var(--primary-red); font-size: 1.5rem; font-weight: 700;" id="statTotalAdmins">0</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1199,109 +1305,242 @@
     </div>
 
     <script>
-        // Database Class
+        // Database Class with FULL PERSISTENCE
         class Database {
             constructor() {
                 this.init();
             }
 
             init() {
+                // Initialize members array if not exists
                 if (!localStorage.getItem('dvlz_roblox_members')) {
                     localStorage.setItem('dvlz_roblox_members', JSON.stringify([]));
                 }
+                
+                // Initialize current user if not exists
                 if (!localStorage.getItem('dvlz_roblox_current_user')) {
                     localStorage.setItem('dvlz_roblox_current_user', '');
                 }
+                
+                // Initialize settings with defaults
+                if (!localStorage.getItem('dvlz_roblox_settings')) {
+                    const defaultSettings = {
+                        badge: '🎮 Roblox Community',
+                        title: 'DVLZ',
+                        subtitle: 'Join komuniti Roblox yang paling power di Malaysia! Main sama-sama, create games, dan build connections dengan players lain yang passionate.',
+                        primaryColor: '#dc2626',
+                        footer: '© 2024 DVLZ Roblox Community. All rights reserved.',
+                        communityName: 'DVLZ ROBLOX',
+                        welcomeMsg: 'Welcome to DVLZ Roblox Community! 🎮'
+                    };
+                    localStorage.setItem('dvlz_roblox_settings', JSON.stringify(defaultSettings));
+                }
             }
 
+            // MEMBERS MANAGEMENT
             getMembers() {
-                return JSON.parse(localStorage.getItem('dvlz_roblox_members') || '[]');
+                try {
+                    const data = localStorage.getItem('dvlz_roblox_members');
+                    return data ? JSON.parse(data) : [];
+                } catch (e) {
+                    console.error('Error getting members:', e);
+                    return [];
+                }
             }
 
             addMember(member) {
-                const members = this.getMembers();
-                member.id = Date.now();
-                member.initial = member.username.substring(0, 2).toUpperCase();
-                member.avatar = null;
-                member.isAdmin = members.length === 0; // First user is admin
-                member.gamesPlayed = Math.floor(Math.random() * 50) + 10;
-                member.hoursPlayed = Math.floor(Math.random() * 500) + 100;
-                member.joinDate = new Date().toLocaleDateString();
-                members.push(member);
-                localStorage.setItem('dvlz_roblox_members', JSON.stringify(members));
-                return member;
+                try {
+                    const members = this.getMembers();
+                    member.id = Date.now();
+                    member.initial = member.username.substring(0, 2).toUpperCase();
+                    member.avatar = null;
+                    member.isAdmin = members.length === 0; // First user is admin
+                    member.gamesPlayed = Math.floor(Math.random() * 50) + 10;
+                    member.hoursPlayed = Math.floor(Math.random() * 500) + 100;
+                    member.joinDate = new Date().toLocaleDateString();
+                    members.push(member);
+                    localStorage.setItem('dvlz_roblox_members', JSON.stringify(members));
+                    
+                    console.log('Member added:', member);
+                    console.log('Total members now:', members.length);
+                    
+                    return member;
+                } catch (e) {
+                    console.error('Error adding member:', e);
+                    return null;
+                }
             }
 
             updateMember(id, data) {
-                const members = this.getMembers();
-                const index = members.findIndex(m => m.id === id);
-                if (index !== -1) {
-                    members[index] = { ...members[index], ...data };
-                    if (data.username) {
-                        members[index].initial = data.username.substring(0, 2).toUpperCase();
+                try {
+                    const members = this.getMembers();
+                    const index = members.findIndex(m => m.id === id);
+                    if (index !== -1) {
+                        members[index] = { ...members[index], ...data };
+                        if (data.username) {
+                            members[index].initial = data.username.substring(0, 2).toUpperCase();
+                        }
+                        localStorage.setItem('dvlz_roblox_members', JSON.stringify(members));
+                        console.log('Member updated:', members[index]);
+                        return members[index];
                     }
-                    localStorage.setItem('dvlz_roblox_members', JSON.stringify(members));
-                    return members[index];
+                    return null;
+                } catch (e) {
+                    console.error('Error updating member:', e);
+                    return null;
                 }
-                return null;
             }
 
             deleteMember(id) {
-                let members = this.getMembers();
-                members = members.filter(m => m.id !== id);
-                localStorage.setItem('dvlz_roblox_members', JSON.stringify(members));
+                try {
+                    let members = this.getMembers();
+                    const before = members.length;
+                    members = members.filter(m => m.id !== id);
+                    localStorage.setItem('dvlz_roblox_members', JSON.stringify(members));
+                    console.log('Member deleted. Before:', before, 'After:', members.length);
+                } catch (e) {
+                    console.error('Error deleting member:', e);
+                }
             }
 
             toggleAdmin(id) {
-                const members = this.getMembers();
-                const index = members.findIndex(m => m.id === id);
-                if (index !== -1) {
-                    members[index].isAdmin = !members[index].isAdmin;
-                    localStorage.setItem('dvlz_roblox_members', JSON.stringify(members));
-                    return members[index];
+                try {
+                    const members = this.getMembers();
+                    const index = members.findIndex(m => m.id === id);
+                    if (index !== -1) {
+                        members[index].isAdmin = !members[index].isAdmin;
+                        localStorage.setItem('dvlz_roblox_members', JSON.stringify(members));
+                        console.log('Admin toggled:', members[index]);
+                        return members[index];
+                    }
+                    return null;
+                } catch (e) {
+                    console.error('Error toggling admin:', e);
+                    return null;
                 }
-                return null;
-            }
-
-            getCurrentUser() {
-                const userId = localStorage.getItem('dvlz_roblox_current_user');
-                if (!userId) return null;
-                const members = this.getMembers();
-                return members.find(m => m.id == userId);
-            }
-
-            setCurrentUser(userId) {
-                localStorage.setItem('dvlz_roblox_current_user', userId);
             }
 
             getMember(id) {
-                const members = this.getMembers();
-                return members.find(m => m.id === id);
+                try {
+                    const members = this.getMembers();
+                    return members.find(m => m.id == id);
+                } catch (e) {
+                    console.error('Error getting member:', e);
+                    return null;
+                }
+            }
+
+            // USER SESSION
+            getCurrentUser() {
+                try {
+                    const userId = localStorage.getItem('dvlz_roblox_current_user');
+                    if (!userId) return null;
+                    return this.getMember(userId);
+                } catch (e) {
+                    console.error('Error getting current user:', e);
+                    return null;
+                }
+            }
+
+            setCurrentUser(userId) {
+                try {
+                    localStorage.setItem('dvlz_roblox_current_user', String(userId));
+                    console.log('Current user set:', userId);
+                } catch (e) {
+                    console.error('Error setting current user:', e);
+                }
+            }
+
+            // SETTINGS
+            getSettings() {
+                try {
+                    const data = localStorage.getItem('dvlz_roblox_settings');
+                    return data ? JSON.parse(data) : {};
+                } catch (e) {
+                    console.error('Error getting settings:', e);
+                    return {};
+                }
+            }
+
+            updateSettings(settings) {
+                try {
+                    const current = this.getSettings();
+                    const updated = { ...current, ...settings };
+                    localStorage.setItem('dvlz_roblox_settings', JSON.stringify(updated));
+                    console.log('Settings updated:', updated);
+                    return updated;
+                } catch (e) {
+                    console.error('Error updating settings:', e);
+                    return null;
+                }
+            }
+
+            // UTILITY
+            resetAll() {
+                try {
+                    localStorage.removeItem('dvlz_roblox_members');
+                    localStorage.removeItem('dvlz_roblox_current_user');
+                    localStorage.removeItem('dvlz_roblox_settings');
+                    this.init();
+                    console.log('All data reset');
+                } catch (e) {
+                    console.error('Error resetting data:', e);
+                }
+            }
+
+            exportData() {
+                try {
+                    return {
+                        members: this.getMembers(),
+                        settings: this.getSettings(),
+                        exportDate: new Date().toISOString()
+                    };
+                } catch (e) {
+                    console.error('Error exporting data:', e);
+                    return null;
+                }
             }
         }
 
+        // Initialize Database
         const db = new Database();
         let currentUser = null;
 
-        // Initialize
+        // INITIALIZATION
         function init() {
+            console.log('Initializing application...');
+            
             currentUser = db.getCurrentUser();
+            console.log('Current user:', currentUser);
+            
             if (!currentUser) {
                 document.getElementById('loginModal').classList.add('active');
             } else {
                 document.getElementById('loginModal').classList.remove('active');
                 updateNavUser();
-                loadMembers();
-                loadAdmins();
+                loadAllContent();
+                
                 if (currentUser.isAdmin) {
                     document.getElementById('adminMenuItem').style.display = 'flex';
                 }
             }
+            
+            loadSiteSettings();
         }
 
-        // Login
+        // LOAD ALL CONTENT - THIS IS KEY!
+        function loadAllContent() {
+            console.log('Loading all content...');
+            loadMembers();
+            loadAdmins();
+            updateMemberCounts();
+        }
+
+        // LOGIN FORM
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            console.log('Login form submitted');
+            
             const btn = document.getElementById('loginSubmitBtn');
             const originalText = btn.textContent;
             btn.disabled = true;
@@ -1319,73 +1558,100 @@
                 favGame: ''
             });
 
-            db.setCurrentUser(member.id);
-            currentUser = member;
+            if (member) {
+                db.setCurrentUser(member.id);
+                currentUser = member;
 
-            btn.disabled = false;
-            btn.textContent = originalText;
-            document.getElementById('loginModal').classList.remove('active');
+                btn.disabled = false;
+                btn.textContent = originalText;
+                document.getElementById('loginModal').classList.remove('active');
 
-            showNotification('Welcome to DVLZ Roblox Community!', 'success');
-            updateNavUser();
-            loadMembers();
-            loadAdmins();
-
-            if (currentUser.isAdmin) {
-                document.getElementById('adminMenuItem').style.display = 'flex';
+                const settings = db.getSettings();
+                showNotification(settings.welcomeMsg || 'Welcome to DVLZ Roblox Community!', 'success');
+                
+                updateNavUser();
+                loadAllContent(); // RELOAD ALL CONTENT
+                
+                if (currentUser.isAdmin) {
+                    document.getElementById('adminMenuItem').style.display = 'flex';
+                }
             }
         });
 
-        // Update Nav User
+        // UPDATE NAV USER
         function updateNavUser() {
-            if (currentUser) {
-                const navInitial = document.getElementById('navUserInitial');
-                if (currentUser.avatar) {
-                    navInitial.innerHTML = `<img src="${currentUser.avatar}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
-                } else {
-                    navInitial.textContent = currentUser.initial;
-                }
+            if (!currentUser) return;
+            
+            const navProfileNav = document.getElementById('userProfileNav');
+            if (currentUser.avatar) {
+                navProfileNav.innerHTML = `<img src="${currentUser.avatar}" alt="${currentUser.username}">`;
+            } else {
+                navProfileNav.innerHTML = `<span id="navUserInitial">${currentUser.initial}</span>`;
             }
         }
 
-        // Load Members
+        // LOAD MEMBERS - COMPLETE FUNCTION
         function loadMembers() {
             const members = db.getMembers();
+            console.log('Loading members:', members.length, 'total');
+            
             const grid = document.getElementById('membersGrid');
+            grid.innerHTML = ''; // Clear first
             
             if (members.length === 0) {
                 grid.innerHTML = '<div class="no-members"><h3>No members yet</h3><p>Be the first to join!</p></div>';
                 return;
             }
 
-            grid.innerHTML = '';
             members.forEach(member => {
                 const card = createMemberCard(member);
                 grid.appendChild(card);
             });
-
-            loadAdminMembersList();
+            
+            console.log('Members loaded to grid');
         }
 
-        // Load Admins
+        // LOAD ADMINS - COMPLETE FUNCTION
         function loadAdmins() {
             const members = db.getMembers();
             const admins = members.filter(m => m.isAdmin);
+            console.log('Loading admins:', admins.length, 'total');
+            
             const grid = document.getElementById('adminsGrid');
+            grid.innerHTML = ''; // Clear first
             
             if (admins.length === 0) {
                 grid.innerHTML = '<div class="no-members"><h3>No admins yet</h3></div>';
                 return;
             }
 
-            grid.innerHTML = '';
             admins.forEach(admin => {
                 const card = createMemberCard(admin);
                 grid.appendChild(card);
             });
+            
+            console.log('Admins loaded to grid');
         }
 
-        // Create Member Card
+        // UPDATE MEMBER COUNTS
+        function updateMemberCounts() {
+            const members = db.getMembers();
+            const admins = members.filter(m => m.isAdmin);
+            
+            const memberCount = document.getElementById('memberCount');
+            const adminCount = document.getElementById('adminCount');
+            
+            if (memberCount) memberCount.textContent = `${members.length} Members`;
+            if (adminCount) adminCount.textContent = `${admins.length} Admins`;
+            
+            // Update admin panel stats
+            const statMembers = document.getElementById('statTotalMembers');
+            const statAdmins = document.getElementById('statTotalAdmins');
+            if (statMembers) statMembers.textContent = members.length;
+            if (statAdmins) statAdmins.textContent = admins.length;
+        }
+
+        // CREATE MEMBER CARD
         function createMemberCard(member) {
             const card = document.createElement('div');
             card.className = 'member-card';
@@ -1417,7 +1683,7 @@
             return card;
         }
 
-        // Open Member Detail
+        // MEMBER DETAIL MODAL
         function openMemberDetail(memberId) {
             const member = db.getMember(memberId);
             if (!member) return;
@@ -1445,7 +1711,7 @@
             document.getElementById('memberDetailModal').classList.remove('active');
         }
 
-        // Profile Management
+        // PROFILE MANAGEMENT
         function openProfile() {
             if (!currentUser) return;
 
@@ -1469,7 +1735,7 @@
             document.getElementById('profileModal').classList.remove('active');
         }
 
-        // Upload Avatar
+        // UPLOAD AVATAR
         function uploadAvatar(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1485,15 +1751,14 @@
                     const avatarLarge = document.getElementById('profileAvatarLarge');
                     avatarLarge.innerHTML = `<img src="${e.target.result}" alt="${currentUser.username}"><div class="upload-overlay" onclick="document.getElementById('avatarUpload').click()"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>`;
                     updateNavUser();
-                    loadMembers();
-                    loadAdmins();
+                    loadAllContent(); // RELOAD
                     showNotification('Avatar updated!', 'success');
                 }
             };
             reader.readAsDataURL(file);
         }
 
-        // Profile Form Submit
+        // PROFILE FORM
         document.getElementById('profileForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('profileSubmitBtn');
@@ -1513,8 +1778,7 @@
             if (updatedUser) {
                 currentUser = updatedUser;
                 updateNavUser();
-                loadMembers();
-                loadAdmins();
+                loadAllContent(); // RELOAD
                 showNotification('Profile updated successfully!', 'success');
             }
 
@@ -1523,7 +1787,7 @@
             closeProfile();
         });
 
-        // Admin Panel
+        // ADMIN PANEL
         function openAdminPanel() {
             if (!currentUser || !currentUser.isAdmin) {
                 showNotification('You need admin access!', 'error');
@@ -1531,6 +1795,7 @@
             }
             document.getElementById('adminPanel').classList.add('active');
             loadAdminMembersList();
+            loadAdminSettings();
             toggleUserDropdown();
         }
 
@@ -1546,6 +1811,7 @@
             document.getElementById('admin' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.add('active');
         }
 
+        // LOAD ADMIN MEMBERS LIST
         function loadAdminMembersList() {
             const members = db.getMembers();
             const list = document.getElementById('adminMembersList');
@@ -1595,8 +1861,7 @@
             const member = db.toggleAdmin(memberId);
             if (member) {
                 loadAdminMembersList();
-                loadMembers();
-                loadAdmins();
+                loadAllContent(); // RELOAD
                 showNotification(`${member.username} is now ${member.isAdmin ? 'an admin' : 'a regular member'}`, 'success');
             }
         }
@@ -1605,13 +1870,133 @@
             if (confirm('Are you sure you want to remove this member?')) {
                 db.deleteMember(memberId);
                 loadAdminMembersList();
-                loadMembers();
-                loadAdmins();
+                loadAllContent(); // RELOAD
                 showNotification('Member removed successfully', 'success');
             }
         }
 
-        // Navigation
+        // SETTINGS MANAGEMENT
+        function loadSiteSettings() {
+            const settings = db.getSettings();
+            
+            document.getElementById('heroBadge').textContent = settings.badge || '🎮 Roblox Community';
+            document.getElementById('heroTitle').textContent = settings.title || 'DVLZ';
+            document.getElementById('heroSubtitle').textContent = settings.subtitle || '';
+            document.getElementById('footerText').textContent = settings.footer || '';
+            document.getElementById('logoTitle').textContent = settings.title || 'DVLZ';
+            document.getElementById('footerTitle').textContent = settings.title || 'DVLZ';
+            
+            if (settings.primaryColor) {
+                document.documentElement.style.setProperty('--primary-red', settings.primaryColor);
+                const darkColor = adjustColor(settings.primaryColor, -20);
+                document.documentElement.style.setProperty('--dark-red', darkColor);
+            }
+        }
+
+        function loadAdminSettings() {
+            const settings = db.getSettings();
+            
+            document.getElementById('settingBadge').value = settings.badge || '';
+            document.getElementById('settingTitle').value = settings.title || '';
+            document.getElementById('settingSubtitle').value = settings.subtitle || '';
+            document.getElementById('settingPrimaryColor').value = settings.primaryColor || '#dc2626';
+            document.getElementById('settingPrimaryColorText').value = settings.primaryColor || '#dc2626';
+            document.getElementById('settingFooter').value = settings.footer || '';
+            document.getElementById('settingCommunityName').value = settings.communityName || '';
+            document.getElementById('settingWelcomeMsg').value = settings.welcomeMsg || '';
+            
+            updateMemberCounts();
+        }
+
+        function saveHeroSettings() {
+            const settings = {
+                badge: document.getElementById('settingBadge').value,
+                title: document.getElementById('settingTitle').value,
+                subtitle: document.getElementById('settingSubtitle').value
+            };
+            
+            db.updateSettings(settings);
+            loadSiteSettings();
+            showNotification('Hero section updated!', 'success');
+        }
+
+        function saveColorSettings() {
+            const color = document.getElementById('settingPrimaryColor').value;
+            db.updateSettings({ primaryColor: color });
+            loadSiteSettings();
+            showNotification('Color theme applied!', 'success');
+        }
+
+        function saveFooterSettings() {
+            const footer = document.getElementById('settingFooter').value;
+            db.updateSettings({ footer });
+            loadSiteSettings();
+            showNotification('Footer updated!', 'success');
+        }
+
+        function saveGeneralSettings() {
+            const settings = {
+                communityName: document.getElementById('settingCommunityName').value,
+                welcomeMsg: document.getElementById('settingWelcomeMsg').value
+            };
+            
+            db.updateSettings(settings);
+            showNotification('Settings saved!', 'success');
+        }
+
+        // Color picker live update
+        document.addEventListener('DOMContentLoaded', () => {
+            const colorPicker = document.getElementById('settingPrimaryColor');
+            const colorText = document.getElementById('settingPrimaryColorText');
+            
+            if (colorPicker && colorText) {
+                colorPicker.addEventListener('input', (e) => {
+                    colorText.value = e.target.value;
+                });
+            }
+        });
+
+        function adjustColor(color, percent) {
+            const num = parseInt(color.replace("#",""), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 +
+                (G<255?G<1?0:G:255)*0x100 + (B<255?B<1?0:B:255))
+                .toString(16).slice(1);
+        }
+
+        function resetAllData() {
+            if (confirm('⚠️ WARNING: This will delete ALL community data including members, settings, and your account. This action CANNOT be undone. Are you absolutely sure?')) {
+                if (confirm('Last chance! Type "DELETE" in the next prompt to confirm.')) {
+                    const confirmation = prompt('Type DELETE to confirm:');
+                    if (confirmation === 'DELETE') {
+                        db.resetAll();
+                        showNotification('All data has been reset!', 'success');
+                        setTimeout(() => location.reload(), 2000);
+                    } else {
+                        showNotification('Reset cancelled', 'success');
+                    }
+                }
+            }
+        }
+
+        function exportData() {
+            const data = db.exportData();
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `dvlz-roblox-backup-${new Date().getTime()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('Data exported successfully!', 'success');
+        }
+
+        // NAVIGATION
         function showSection(section) {
             document.getElementById('homeSection').style.display = 'none';
             document.getElementById('membersSection').style.display = 'none';
@@ -1621,20 +2006,22 @@
                 document.getElementById('homeSection').style.display = 'block';
             } else if (section === 'members') {
                 document.getElementById('membersSection').style.display = 'block';
+                loadMembers(); // RELOAD when showing
             } else if (section === 'admins') {
                 document.getElementById('adminsSection').style.display = 'block';
+                loadAdmins(); // RELOAD when showing
             }
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // User Dropdown
+        // USER DROPDOWN
         function toggleUserDropdown() {
             const dropdown = document.getElementById('userDropdown');
             dropdown.classList.toggle('active');
         }
 
-        // Logout
+        // LOGOUT
         function logout() {
             if (confirm('Are you sure you want to logout?')) {
                 localStorage.removeItem('dvlz_roblox_current_user');
@@ -1642,21 +2029,14 @@
             }
         }
 
-        // Search
+        // SEARCH
         function filterMembers() {
             const search = document.getElementById('memberSearch').value.toLowerCase();
             const cards = document.querySelectorAll('#membersGrid .member-card');
             
             cards.forEach(card => {
-                const name = card.querySelector('.member-name').textContent.toLowerCase();
-                const role = card.querySelector('.member-role').textContent.toLowerCase();
-                const bio = card.querySelector('.member-bio').textContent.toLowerCase();
-                
-                if (name.includes(search) || role.includes(search) || bio.includes(search)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(search) ? 'block' : 'none';
             });
         }
 
@@ -1670,7 +2050,7 @@
             });
         }
 
-        // Notification
+        // NOTIFICATION
         function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
             const notificationText = document.getElementById('notificationText');
@@ -1683,7 +2063,7 @@
             }, 5000);
         }
 
-        // Navbar Scroll
+        // NAVBAR SCROLL
         const navbar = document.getElementById('navbar');
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) {
@@ -1693,7 +2073,7 @@
             }
         });
 
-        // Close modals on outside click
+        // CLOSE MODALS
         window.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal') && e.target.id !== 'loginModal') {
                 e.target.classList.remove('active');
@@ -1703,8 +2083,11 @@
             }
         });
 
-        // Initialize on load
-        window.addEventListener('DOMContentLoaded', init);
+        // INITIALIZE ON LOAD
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM Content Loaded - Starting init...');
+            init();
+        });
     </script>
 </body>
 </html>
